@@ -1,0 +1,52 @@
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15.7.2/prop-types.js"></script>
+    <script type="text/babel">
+        function Btn({text, changeValue, fontSize=40}){
+            return(
+            <button 
+            onClick = {changeValue}
+            style={{
+                backgroundColor : "tomato",
+                color : "white",
+                padding : "10px 20px",
+                border : 0,
+                borderRadius : 10,
+                fontSize : fontSize,
+            }}>{text}</button>
+            )    
+        }
+        //更新されたかコンポーネントさえ変更するためにメモを生成
+        const MemorizeBtn = React.memo(Btn);
+
+        Btn.propTypes ={
+            text : PropTypes.string.isRequired,
+            pontSize : PropTypes.number
+        }
+        function App () {
+            const [value, setValue] = React.useState("Save Changes");
+            const changeValue = () => setValue("Revert Change")
+            return(
+            <div>
+                <Btn text={value} changeValue={changeValue} fontSize={20}/>
+                <Btn text="Confirm" />
+            </div>
+            )
+        };
+
+        //HTMLエレメント
+        const root = document.getElementById("root");
+        //変換されたエレメントを画面にrender
+        renderContainer(<App />, root);
+        function renderContainer(container, element){
+            ReactDOM.render(container,element);
+        };
+
+       
+    </script>
+</html>

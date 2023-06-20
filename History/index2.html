@@ -1,0 +1,35 @@
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        //HTMLエレメント
+        const root = document.getElementById("root");
+        //画面に表示されるクリック数
+        let counter = 0;
+        //HTMLエレメント,メソッド(Arrow)でReactDOMがエレメントに変換してリターン
+        const Title = () => (<h3>Clicked Counter = {counter}</h3>);
+        const Button = () => (<button onClick={clickBtn}>Click me!</button>);
+        const Container = () =>(
+            <div>
+            <Title />
+            <Button />
+            </div>
+        );
+        //変換されたエレメントを画面にrender
+        renderContainer(<Container />, root);
+        function renderContainer(container, element){
+            ReactDOM.render(container,element);
+        };
+        //画面からボタンが押下された時実行して、Counterを1増加し、画面に再びrender
+        function clickBtn(){
+            counter += 1;
+            //変更されたCounterだけrerenderingする。
+            renderContainer(<Container />, root);
+        }
+       
+    </script>
+</html>

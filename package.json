@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "colors": "^1.4.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.2",
+    "typescript": "^5.1.3"
+  }
+}

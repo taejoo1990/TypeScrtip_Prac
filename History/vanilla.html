@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <span id="span">Total Click = 0</span>
+        <button id="btn">Click me</button>
+    </body>
+    <script>
+        let counter=0;
+        const button = document.getElementById("btn");
+        const span = document.getElementById("span");
+        function handledClick(){
+            counter += 1 ;
+            span.innerText=`Total Click = ${counter}`;
+        }
+        button.addEventListener("click", handledClick);
+    </script>
+</html>
