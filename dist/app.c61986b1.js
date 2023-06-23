@@ -140,6 +140,22 @@ var __extends = this && this.__extends || function () {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
   };
 }();
+var __values = this && this.__values || function (o) {
+  var s = typeof Symbol === "function" && Symbol.iterator,
+    m = s && o[s],
+    i = 0;
+  if (m) return m.call(o);
+  if (o && typeof o.length === "number") return {
+    next: function next() {
+      if (o && i >= o.length) o = void 0;
+      return {
+        value: o && o[i++],
+        done: !o
+      };
+    }
+  };
+  throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 //--------Global Valiable -------------
 var ajax = new XMLHttpRequest();
 var NEWS_URL = 'https://api.hnpwa.com/v0/news/1.json';
@@ -226,6 +242,7 @@ var NewsFeedView = /** @class */function (_super) {
     }
   };
   NewsFeedView.prototype.render = function () {
+    store.currentPage = Number(location.hash.substr(7) || 1);
     for (var i = (store.currentPage - 1) * 5; i < store.currentPage * 5; i++) {
       var _a = this.feeds[i],
         id = _a.id,
@@ -281,7 +298,7 @@ var NewsDetailView = /** @class */function (_super) {
 //------------Router Class----------
 var Router = /** @class */function () {
   function Router() {
-    window.addEventListener('hashchange', router);
+    window.addEventListener('hashchange', this.route.bind(this));
     this.routeTable = [];
     this.defaultRoute = null;
   }
@@ -298,8 +315,30 @@ var Router = /** @class */function () {
     });
   };
   Router.prototype.route = function () {
+    var e_1, _a;
     var routePath = location.hash;
-    if (routePath === '' && this.defaultRoute) {}
+    if (routePath === '' && this.defaultRoute) {
+      this.defaultRoute.page.render();
+    }
+    try {
+      for (var _b = __values(this.routeTable), _c = _b.next(); !_c.done; _c = _b.next()) {
+        var routeInfo = _c.value;
+        if (routePath.indexOf(routeInfo.path) >= 0) {
+          routeInfo.page.render();
+          break;
+        }
+      }
+    } catch (e_1_1) {
+      e_1 = {
+        error: e_1_1
+      };
+    } finally {
+      try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+      } finally {
+        if (e_1) throw e_1.error;
+      }
+    }
   };
   return Router;
 }();
@@ -324,6 +363,7 @@ var newsDetailView = new NewsDetailView('root');
 router.setDefaultPage(newsFeedView);
 router.addRoutePath('/page/', newsFeedView);
 router.addRoutePath('/show/', newsDetailView);
+router.route();
 },{}],"../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -349,7 +389,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52991" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60101" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

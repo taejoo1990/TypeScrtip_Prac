@@ -62,7 +62,7 @@ class NewsDetailApi{
   }
 }
 //-------------View Class
-class View{
+abstract class  View{
   template : string;
   renderTemplate : string;
   container : HTMLElement;
@@ -100,6 +100,7 @@ class View{
   clearHtmlList() : void{
     this.htmlList =[];
   }
+  abstract render() : void;
 }
 class NewsFeedView extends View{
   api : NewsFeedApi;
@@ -145,6 +146,7 @@ class NewsFeedView extends View{
     }
   }
   render() : void{
+    store.currentPage = Number(location.hash.substr(7) || 1)
     for(let i = (store.currentPage - 1) * 5; i < store.currentPage * 5; i++) {
       const {id, title, comments_count, user, points, time_ago, read} = this.feeds[i];
       this.addHtml(`
@@ -172,6 +174,8 @@ class NewsFeedView extends View{
     this.setTemplateData('news_Feed',this.getHtml());
     this.setTemplateData('prev_page',String(store.currentPage > 1 ? store.currentPage - 1 : 1));
     this.setTemplateData('next_page',String(store.currentPage + 1));
+    
+    
     this.updateView();
   }
 
@@ -250,8 +254,7 @@ class Router{
   routeTable : RouteInfo[];
   defaultRoute : RouteInfo | null;
   constructor(){
-   
-    window.addEventListener('hashchange', router);
+    window.addEventListener('hashchange', this.route.bind(this));
     this.routeTable = [];
     this.defaultRoute = null;
   }
@@ -265,7 +268,13 @@ class Router{
   route(){
     const routePath = location.hash;
     if(routePath ==='' && this.defaultRoute){
-      
+      this.defaultRoute.page.render();
+    }
+    for (const routeInfo of this.routeTable){
+      if(routePath.indexOf(routeInfo.path) >= 0){
+        routeInfo.page.render();
+        break;
+      }
     }
   }
 }
@@ -294,3 +303,5 @@ const newsDetailView = new NewsDetailView('root');
 router.setDefaultPage(newsFeedView);
 router.addRoutePath('/page/', newsFeedView);
 router.addRoutePath('/show/', newsDetailView);
+
+router.route();
