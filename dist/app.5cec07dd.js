@@ -284,10 +284,13 @@ var Api = /*#__PURE__*/function () {
   }
   _createClass(Api, [{
     key: "getRequest",
-    value: function getRequest() {
-      this.ajax.open('GET', this.url, false);
+    value: function getRequest(cb) {
+      var _this = this;
+      this.ajax.open('GET', this.url);
+      this.ajax.addEventListener('load', function () {
+        cb(JSON.parse(_this.ajax.response));
+      });
       this.ajax.send();
-      return JSON.parse(this.ajax.response);
     }
   }]);
   return Api;
@@ -296,14 +299,14 @@ exports.Api = Api;
 var NewsFeedApi = /*#__PURE__*/function (_Api) {
   _inherits(NewsFeedApi, _Api);
   var _super = _createSuper(NewsFeedApi);
-  function NewsFeedApi() {
+  function NewsFeedApi(url) {
     _classCallCheck(this, NewsFeedApi);
-    return _super.apply(this, arguments);
+    return _super.call(this, url);
   }
   _createClass(NewsFeedApi, [{
     key: "getData",
-    value: function getData() {
-      return this.getRequest();
+    value: function getData(cb) {
+      return this.getRequest(cb);
     }
   }]);
   return NewsFeedApi;
@@ -312,14 +315,14 @@ exports.NewsFeedApi = NewsFeedApi;
 var NewsDetailApi = /*#__PURE__*/function (_Api2) {
   _inherits(NewsDetailApi, _Api2);
   var _super2 = _createSuper(NewsDetailApi);
-  function NewsDetailApi() {
+  function NewsDetailApi(url) {
     _classCallCheck(this, NewsDetailApi);
-    return _super2.apply(this, arguments);
+    return _super2.call(this, url);
   }
   _createClass(NewsDetailApi, [{
     key: "getData",
-    value: function getData() {
-      return this.getRequest();
+    value: function getData(cb) {
+      return this.getRequest(cb);
     }
   }]);
   return NewsDetailApi;
@@ -371,16 +374,17 @@ var NewsDetailView = /*#__PURE__*/function (_view_1$default) {
     _this = _super.call(this, containerId, template);
     _this.render = function (id) {
       var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id));
-      var _api$getData = api.getData(),
-        title = _api$getData.title,
-        content = _api$getData.content,
-        comments = _api$getData.comments;
-      _this.store.makeRead(Number(id));
-      _this.setTemplateData('currentPage', _this.store.currentPage.toString());
-      _this.setTemplateData('title', title);
-      _this.setTemplateData('content', content);
-      _this.setTemplateData('comments', _this.makeComment(comments));
-      _this.updateView();
+      api.getData(function (data) {
+        var title = data.title,
+          content = data.content,
+          comments = data.comments;
+        _this.store.makeRead(Number(id));
+        _this.setTemplateData('currentPage', _this.store.currentPage.toString());
+        _this.setTemplateData('title', title);
+        _this.setTemplateData('content', content);
+        _this.setTemplateData('comments', _this.makeComment(comments));
+        _this.updateView();
+      });
     };
     _this.store = store;
     return _this;
@@ -439,6 +443,15 @@ var NewsFeedView = /*#__PURE__*/function (_view_1$default) {
     _this.render = function () {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '1';
       _this.store.currentPage = Number(page);
+      if (!_this.store.hasFeeds) {
+        _this.api.getData(function (feeds) {
+          _this.store.setFeeds(feeds);
+          _this.renderView();
+        });
+      }
+      _this.renderView();
+    };
+    _this.renderView = function () {
       for (var i = (_this.store.currentPage - 1) * 10; i < _this.store.currentPage * 10; i++) {
         var _this$store$getFeed = _this.store.getFeed(i),
           id = _this$store$getFeed.id,
@@ -457,9 +470,6 @@ var NewsFeedView = /*#__PURE__*/function (_view_1$default) {
     };
     _this.store = store;
     _this.api = new api_1.NewsFeedApi(config_1.NEWS_URL);
-    if (!_this.store.hasFeeds) {
-      _this.store.setFeeds(_this.api.getData());
-    }
     return _this;
   }
   return _createClass(NewsFeedView);
@@ -617,7 +627,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58223" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59397" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
